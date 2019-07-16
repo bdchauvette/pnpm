@@ -4,6 +4,7 @@ import install from './install'
 import installTest from './installTest'
 import link from './link'
 import list from './list'
+import makeDedicatedLockfile from './makeDedicatedLockfile'
 import outdated from './outdated'
 import prune from './prune'
 import publish, { pack } from './publish'
@@ -24,6 +25,7 @@ export default {
   installTest,
   link,
   list,
+  makeDedicatedLockfile,
   outdated,
   pack,
   prune,

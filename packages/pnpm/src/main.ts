@@ -30,6 +30,7 @@ import packageManager from './pnpmPkgJson'
 import initReporter, { ReporterType } from './reporter'
 
 pnpmCmds['install-test'] = pnpmCmds.installTest
+pnpmCmds['make-dedicated-lockfile'] = pnpmCmds.makeDedicatedLockfile
 
 type CANONICAL_COMMAND_NAMES = 'help'
   | 'import'
@@ -37,6 +38,7 @@ type CANONICAL_COMMAND_NAMES = 'help'
   | 'install'
   | 'link'
   | 'list'
+  | 'make-dedicated-lockfile'
   | 'outdated'
   | 'pack'
   | 'prune'
@@ -62,6 +64,7 @@ const supportedCmds = new Set<CANONICAL_COMMAND_NAMES>([
   'uninstall',
   'update',
   'link',
+  'make-dedicated-lockfile',
   'pack',
   'prune',
   'publish',
