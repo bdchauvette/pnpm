@@ -1,6 +1,6 @@
 import { getLockfileImporterId } from '@pnpm/lockfile-file'
 import { Modules, read as readModulesYaml } from '@pnpm/modules-yaml'
-import { Registries } from '@pnpm/types'
+import { Registries, DependenciesField } from '@pnpm/types'
 import {
   normalizeRegistries,
   realNodeModulesDir,
@@ -10,30 +10,23 @@ import path = require('path')
 export interface ImporterOptions {
   bin?: string,
   prefix: string,
-  shamefullyFlatten?: boolean,
+  shamefullyFlatten?: boolean | string,
 }
 
 export default async function <T>(
   importers: (ImporterOptions & T)[],
   lockfileDirectory: string,
   opts: {
-    shamefullyFlatten: boolean,
+    shamefullyFlatten: boolean | string,
   },
 ): Promise<{
   importers: Array<{
-    bin: string,
     currentShamefullyFlatten: boolean | null,
     hoistedAliases: { [depPath: string]: string[] },
     id: string,
     modulesDir: string,
-    prefix: string,
-    shamefullyFlatten: boolean,
-  } & T>,
-  include: {
-    dependencies: boolean,
-    devDependencies: boolean,
-    optionalDependencies: boolean,
-  },
+  } & T & Required<ImporterOptions>>,
+  include: Record<DependenciesField, boolean>,
   modules: Modules | null,
   pendingBuilds: string[],
   registries: Registries | null | undefined,
@@ -56,9 +49,7 @@ export default async function <T>(
           hoistedAliases: importerModules && importerModules.hoistedAliases || {},
           id: importerId,
           modulesDir,
-          shamefullyFlatten: Boolean(
-            typeof importer.shamefullyFlatten === 'boolean' ? importer.shamefullyFlatten : opts.shamefullyFlatten
-          ),
+          shamefullyFlatten: typeof importer.shamefullyFlatten !== 'undefined' ? importer.shamefullyFlatten : opts.shamefullyFlatten,
         }
       })),
     include: modules && modules.included || { dependencies: true, devDependencies: true, optionalDependencies: true },

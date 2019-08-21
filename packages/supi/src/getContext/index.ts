@@ -23,14 +23,10 @@ export interface PnpmContext<T> {
   existsCurrentLockfile: boolean,
   existsWantedLockfile: boolean,
   importers: Array<{
-    bin: string,
     hoistedAliases: {[depPath: string]: string[]}
-    manifest: ImporterManifest,
     modulesDir: string,
     id: string,
-    prefix: string,
-    shamefullyFlatten: boolean,
-  } & T>,
+  } & T & Required<ImportersOptions>>,
   include: IncludedDependencies,
   modulesFile: Modules | null,
   pendingBuilds: string[],
@@ -46,7 +42,7 @@ export interface ImportersOptions {
   bin?: string,
   manifest: ImporterManifest,
   prefix: string,
-  shamefullyFlatten?: boolean,
+  shamefullyFlatten?: boolean | string,
 }
 
 export default async function getContext<T> (
@@ -61,7 +57,7 @@ export default async function getContext<T> (
     include?: IncludedDependencies,
     independentLeaves: boolean,
     registries: Registries,
-    shamefullyFlatten: boolean,
+    shamefullyFlatten: boolean | string,
     store: string,
     useLockfile: boolean,
   },
@@ -128,7 +124,7 @@ async function validateNodeModules (
     id: string,
     prefix: string,
     currentShamefullyFlatten: boolean | null,
-    shamefullyFlatten: boolean,
+    shamefullyFlatten: boolean | string,
   }>,
   opts: {
     force: boolean,
@@ -246,7 +242,7 @@ export async function getContextForSingleImporter (
     independentLeaves: boolean,
     prefix: string,
     registries: Registries,
-    shamefullyFlatten: boolean,
+    shamefullyFlatten: boolean | string,
     store: string,
     useLockfile: boolean,
   },
