@@ -84,7 +84,7 @@ export default async function (
     renderLatest,
     renderDetails,
   ]
-  return table([
+  const data = [
     columnNames,
     ...R.sortWith(
       [
@@ -94,7 +94,20 @@ export default async function (
       outdatedPackages.map(toOutdatedWithVersionDiff)
     )
       .map((outdatedPkg) => columnFns.map((fn) => fn(outdatedPkg))),
-  ], TABLE_OPTIONS)
+  ]
+  return table(data, {
+    ...TABLE_OPTIONS,
+    columns: {
+      ...TABLE_OPTIONS.columns,
+      3: {
+        width: getCellWidth(data, 3, 40),
+      },
+    },
+  })
+}
+
+export function getCellWidth (data: string[][], columnNumber: number, maxWidth: number) {
+  return Math.min(maxWidth, data.reduce((maxWidth, row) => Math.max(maxWidth, row[columnNumber].length), 0))
 }
 
 export function toOutdatedWithVersionDiff<T> (outdated: T & OutdatedPackage): T & OutdatedWithVersionDiff {
