@@ -80,9 +80,9 @@ export default async function (
     'Details',
   ]
   let columnFns: Array<(outdatedPkg: OutdatedWithVersionDiff) => string> = [
-    renderPackageName,
-    renderCurrent,
-    renderLatest,
+    R.pipe(renderPackageName, R.partialRight(wrapAnsi, [30, undefined])),
+    R.pipe(renderCurrent, R.partialRight(wrapAnsi, [20, undefined])),
+    R.pipe(renderLatest, R.partialRight(wrapAnsi, [15, undefined])),
     renderDetails,
   ]
   return table([

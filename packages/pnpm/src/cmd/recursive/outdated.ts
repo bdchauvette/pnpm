@@ -3,9 +3,11 @@ import { OutdatedPackage } from '@pnpm/outdated'
 import { DependenciesField, PackageJson, Registries } from '@pnpm/types'
 import R = require('ramda')
 import { table } from 'table'
+import wrapAnsi = require('wrap-ansi')
 import {
   getCellWidth,
   outdatedDependenciesOfWorkspacePackages,
+  OutdatedWithVersionDiff,
   renderCurrent,
   renderDetails,
   renderLatest,
@@ -88,6 +90,16 @@ export default async (
   }
 
   const columnNames = ['Package', 'Current', 'Latest', 'Dependents', 'Details']
+  let columnFns: Array<(outdatedPkg: OutdatedWithVersionDiff & OutdatedInWorkspace) => string> = [
+    R.pipe(renderPackageName, R.partialRight(wrapAnsi, [30, undefined])),
+    R.pipe(renderCurrent, R.partialRight(wrapAnsi, [20, undefined])),
+    R.pipe(renderLatest, R.partialRight(wrapAnsi, [15, undefined])),
+    (outdatedPkg) => outdatedPkg.dependentPkgs
+      .map(({ manifest, location }) => manifest.name || location)
+      .sort()
+      .join(', '),
+    renderDetails,
+  ]
   const data = [
     columnNames,
     ...R.sortWith(
@@ -100,16 +112,7 @@ export default async (
         Object.values(outdatedByNameAndType).map(toOutdatedWithVersionDiff)
       ),
     )
-      .map((outdatedPkg) => [
-        renderPackageName(outdatedPkg),
-        renderCurrent(outdatedPkg),
-        renderLatest(outdatedPkg),
-        outdatedPkg.dependentPkgs
-          .map(({ manifest, location }) => manifest.name || location)
-          .sort()
-          .join(', '),
-        renderDetails(outdatedPkg),
-      ]),
+    .map((outdatedPkg) => columnFns.map((fn) => fn(outdatedPkg))),
   ]
   process.stdout.write(
     table(data, {
