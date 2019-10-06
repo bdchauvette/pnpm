@@ -41,7 +41,7 @@ import run from './run'
 const supportedRecursiveCommands = new Set([
   'add',
   'install',
-  'uninstall',
+  'remove',
   'update',
   'unlink',
   'list',
